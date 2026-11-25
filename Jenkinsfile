@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -8,9 +9,15 @@ pipeline {
             }
         }
 
-        stage('Build WAR with Maven') {
+        stage('SonarQube Analysis') {
             steps {
-                sh 'mvn clean package'
+                script {
+                    def mvn = tool 'Default Maven'
+
+                    withSonarQubeEnv('SonarQube-Server') {
+                        sh "${mvn}/bin/mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=student-registration -Dsonar.projectName=student-registration"
+                    }
+                }
             }
         }
 
@@ -21,3 +28,4 @@ pipeline {
         }
     }
 }
+
